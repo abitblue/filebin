@@ -132,7 +132,7 @@ if __name__ == '__main__':
         with sftp.file(filename, 'wb') as f:
             f.write(args.file.read())
 
-        print(f'Link: https://www.bin.abitblue.com/{pathlib.Path(filename).name}')
+        print(f'Link: https://bin.abitblue.com/{pathlib.Path(filename).name}')
         print('Link will expire at:',
               datetime.fromtimestamp(float(data[1]), tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S %Z'))
 
