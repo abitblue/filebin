@@ -14,7 +14,6 @@ parent_path = pathlib.Path(__file__).parent.absolute()
 
 class ConnStringStoreAction(argparse.Action):
     conn_regex = re.compile(r'(.+?)(?::(.+))?@(.+?):(\d{1,5})(/.*)')
-    match = conn_regex.match('ryang@danielindictor.com:22363/var/www/filebin/server/assets')
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
