@@ -1,0 +1,9 @@
+# Server
+python-dateutil
+schedule
+
+# Client
+paramiko
+
+# Both
+websockets
