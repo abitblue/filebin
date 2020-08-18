@@ -89,12 +89,14 @@ class SFTP:
 if __name__ == '__main__':
     # Arg parse
     parser = argparse.ArgumentParser(
-        prog="filebin",
-        description="Upload to a filebin server via sftp",
+        prog='filebin',
+        description='Upload to a filebin server via sftp',
+        epilog='Connstring looks like this: <username>:<userpassword>@<hostname>:<port>/<absolute path>. '
+               'Ex: user:pass@example.com:22/home/user/filebin/server/assets',
         fromfile_prefix_chars='+'
     )
     parser.add_argument('connstring', action=ConnStringStoreAction, help='Connect to location')
-    parser.add_argument('file', nargs='?', type=argparse.FileType('rb'), default=sys.stdin, help='File to upload')
+    parser.add_argument('file', nargs='?', type=argparse.FileType('rb'), default=sys.stdin, help='File to upload. Blank or \'-\' for stdin')
     parser.add_argument('-i', '--identity-file', type=argparse.FileType('r'), help='SSH Identify File')
 
     args = parser.parse_args()
@@ -132,7 +134,7 @@ if __name__ == '__main__':
         # to_transfer is 0 in print
         file_size = os.fstat(args.file.fileno()).st_size
         def print_totals(transferred: int, to_transfer: int):
-            percent = '{0:.0f}'.format((file_size if file_size == 0 else transferred) / file_size * 100)
+            percent = '{0:.02f}'.format(transferred / (transferred if file_size == 0 else file_size) * 100)
             print('Transferred: {} of {} bytes ({} %)'.format(transferred, file_size, percent), end='\r')
 
         attr = sftp.putfo(args.file, filename, callback=print_totals)
