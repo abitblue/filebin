@@ -1,9 +1,8 @@
 # Server
-python-dateutil
-schedule
+schedule        # Remove files after they have expired
 
 # Client
-paramiko
+paramiko        # SFTP
 
 # Both
-websockets
+# websockets    # TODO: Web-based functionality?

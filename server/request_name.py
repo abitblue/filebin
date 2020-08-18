@@ -3,9 +3,7 @@ import pathlib
 import random
 import sqlite3
 import string
-from datetime import datetime, timezone
-
-from dateutil import relativedelta
+from datetime import datetime, timezone, timedelta
 
 parent_path = pathlib.Path(__file__).parent.absolute()
 
@@ -38,7 +36,7 @@ class SQLite:
         while self.check_name(candidate):  # If name is taken, try again
             candidate = gen_random()
 
-        tmp = datetime.now(timezone.utc) + relativedelta.relativedelta(months=1)
+        tmp = datetime.now(timezone.utc) + timedelta(weeks=4)
         expire = int(datetime(tmp.year, tmp.month, tmp.day, tzinfo=timezone.utc).timestamp())
 
         # To ensure no conflicts, names cannot be reused, and a request for obfuscated name will immediately write
