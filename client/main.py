@@ -1,7 +1,9 @@
 import argparse
+import io
 import pathlib
 import re
 import sys
+from datetime import datetime, timezone
 from getpass import getpass
 from typing import Tuple
 
@@ -41,7 +43,7 @@ class SFTP:
                 self.ssh.connect(hostname, port, username, password=password)
                 connected = self.ssh.get_transport().authenticated
             except paramiko.ssh_exception.BadAuthenticationType:
-                print('Cannot use password to connect')
+                pass
 
         if keyfile and not connected:
             try:
@@ -49,7 +51,7 @@ class SFTP:
                 self.ssh.connect(hostname, port, username, pkey=key)
                 connected = self.ssh.get_transport().authenticated
             except paramiko.ssh_exception.BadAuthenticationType:
-                print('Cannot use pubkey to connect')
+                pass
 
         if not connected:
             raise paramiko.ssh_exception.SSHException(
@@ -82,6 +84,7 @@ class SFTP:
                     pass
         return key
 
+
 if __name__ == '__main__':
     # Arg parse
     parser = argparse.ArgumentParser(
@@ -113,13 +116,24 @@ if __name__ == '__main__':
 
         # Request a filename and expire date
         stdin, stdout, stderr = ssh.exec_command(f'python3 {args.tofiledir}/../request_name.py')
-        print(str(stdout.read(), encoding='utf-8'))
-        print(str(stderr.read(), encoding='utf-8'))
+        data = str(stdout.read(), encoding='utf-8').split()
 
-        filename = ''
+        # stdin has unknown file typing, will default to txt
+        if isinstance(args.file, io.BufferedReader):
+            suffix = pathlib.Path(args.file.name).suffix
+            if suffix == '':
+                suffix = '.txt'
+
+            filename = f'{args.tofiledir}/{data[0]}{suffix}'
+        else:
+            filename = f'{args.tofiledir}/{data[0]}.txt'
 
         # Create file object and write data to file
         with sftp.file(filename, 'wb') as f:
             f.write(args.file.read())
+
+        print(f'Link: https://www.p.abitblue.com/{data[0]}')
+        print('Link will expire at',
+              datetime.fromtimestamp(1600128000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S %Z'))
 
     # asyncio.get_event_loop().run_until_complete(upload(sftp_uri='sftp://ryang@localhost:22', ws_uri='ws://localhost:8765'))
