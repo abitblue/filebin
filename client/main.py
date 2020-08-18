@@ -132,8 +132,8 @@ if __name__ == '__main__':
         with sftp.file(filename, 'wb') as f:
             f.write(args.file.read())
 
-        print(f'Link: https://www.p.abitblue.com/{data[0]}')
-        print('Link will expire at',
+        print(f'Link: https://www.p.abitblue.com/{filename}')
+        print('Link will expire at:',
               datetime.fromtimestamp(1600128000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S %Z'))
 
     # asyncio.get_event_loop().run_until_complete(upload(sftp_uri='sftp://ryang@localhost:22', ws_uri='ws://localhost:8765'))
