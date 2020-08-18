@@ -1,5 +1,6 @@
 import argparse
 import io
+import os
 import pathlib
 import re
 import sys
@@ -71,6 +72,7 @@ class SFTP:
         key = None
         while not opened:
             try:
+                keyfile.seek(0)
                 key = paramiko.RSAKey.from_private_key(keyfile)
                 opened = key.can_sign()
             except paramiko.ssh_exception.PasswordRequiredException:
@@ -127,9 +129,14 @@ if __name__ == '__main__':
         else:
             filename = f'{args.tofiledir}/{data[0]}.txt'
 
-        # Create file object and write data to file
-        with sftp.file(filename, 'wb') as f:
-            f.write(args.file.read())
+        # to_transfer is 0 in print
+        file_size = os.fstat(args.file.fileno()).st_size
+        def print_totals(transferred: int, to_transfer: int):
+            percent = '{0:.0f}'.format((file_size if file_size == 0 else transferred) / file_size * 100)
+            print('Transferred: {} of {} bytes ({} %)'.format(transferred, file_size, percent), end='\r')
+
+        attr = sftp.putfo(args.file, filename, callback=print_totals)
+        print('\n' + str(attr))
 
         print(f'Link: https://bin.abitblue.com/{pathlib.Path(filename).name}')
         print('Link will expire at:',
